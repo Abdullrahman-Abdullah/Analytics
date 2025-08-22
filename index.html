@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialInsight - أداة تحليلات وسائل التواصل الاجتماعي</title>
+    <style>
+        /* أساسيات التصميم */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        /* التصميم العام */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--box-shadow);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-left: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 15px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #e20a6d;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            margin-left: 10px;
+        }
+        
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        #mobile{
+            display:none;
+        }
+        /* الصفحة الرئيسية */
+        .hero {
+            padding: 5rem 0;
+            text-align: center;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%234361ee" opacity="0.1"/><path d="M0 0L100 100" stroke="%234361ee" stroke-width="2" opacity="0.2"/></svg>');
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: #555;
+        }
+        
+        .features {
+            padding: 5rem 0;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--secondary-color);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: var(--light-color);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        
+        .feature-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .feature-card:nth-child(odd) {
+            transform: translateX(100px);
+        }
+        
+        .feature-card:nth-child(even) {
+            transform: translateY(50px);
+        }
+        
+        .feature-card:nth-child(odd).show,
+        .feature-card:nth-child(even).show {
+            transform: translateX(0);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        /* صفحة التسعير */
+        .pricing {
+            padding: 5rem 0;
+            background-color: #f5f7ff;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .pricing-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        
+        .pricing-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .pricing-card:nth-child(odd) {
+            transform: translateX(100px);
+        }
+        
+        .pricing-card:nth-child(even) {
+            transform: translateX(0px);
+        }
+        
+        .pricing-card:nth-child(odd).show{
+            transform: translateX(0px);
+        }
+        .pricing-card:nth-child(even).show {
+            transform: translateX(0);
+        }
+        
+        .pricing-card.popular {
+            border: 2px solid var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.popular::before {
+            content: "الأكثر شعبية";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 1rem 0;
+        }
+        
+        .price span {
+            font-size: 1rem;
+            color: #777;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 1.5rem 0;
+            text-align: right;
+        }
+        
+        .pricing-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+        
+        /* صفحة الاتصال */
+        .contact {
+            padding: 5rem 0;
+            background-color: white;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .contact-info {
+            padding: 2rem;
+        }
+        
+        .contact-info h3 {
+            margin-bottom: 1.5rem;
+            color: offwhite;
+        }
+        
+        .contact-details {
+            list-style: none;
+            z-index:999;
+            text-align: center;
+            width:100%;
+            juatify-content:center;
+        }
+        
+        .contact-details li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            text-align: center; 
+            justify-content:center;
+        }
+        
+        .contact-icon {
+            margin-left: 10px;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .contact-form {
+            background-color: var(--light-color);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        
+        .contact-form.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        #sections{
+            width:100%
+        }
+        #sections hr {
+            display:none;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .footer-links li {
+            margin: 0 15px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            margin-top: 2rem;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* responsive design */
+        @media (max-width: 768px) {
+            header{
+                position: relative;
+            }
+            #sections hr {
+                display: flex;
+                margin-bottom: 5.5vh;
+            }
+            nav {
+                justify-content:center;
+            }
+            #heddin-btn-desk{
+                visibility:hidden;
+            }
+            #desktop{
+                display:none;
+            }
+            #mobile{
+                display:flex;
+                margin:0;
+                padding:0;
+                width:100%;
+                justify-content:center;
+                gap:10px;
+            }
+            .btn-outline{
+                background-color: var(--primary-color);
+                color:white;
+                border: none;
+            }
+            #mobile a{
+                margin:0;
+               
+            }
+            .footer-links {
+            display: block;
+            list-style: none;
+            margin: 2rem 0;
+            }
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .features-grid, .pricing-grid, .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.popular {
+                transform: scale(1);
+            }
+            
+            .feature-card:nth-child(odd){
+                transform: translateX(100px);
+            }
+            .feature-card:nth-child(even){
+                transform: translateY(50px);
+            }
+            .pricing-card:nth-child(odd){
+                transform: translateX(100px);
+            }
+            .pricing-card:nth-child(even) {
+                transform: translateY(50px);
+            }
+            
+            .feature-card:nth-child(odd).show{
+                transform: translateX(0px);
+            }
+            .feature-card:nth-child(even).show{
+                transform: translateX(0px);
+            }
+            .pricing-card:nth-child(odd).show{
+                transform: translateX(0px);
+            }
+            .pricing-card:nth-child(even).show {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <span>SocialInsight</span>
+                    <!--<span class="logo-icon">📊</span>-->
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">الرئيسية</a></li>
+                    <li><a href="#features">الميزات</a></li>
+                    <li><a href="#pricing">الباقات</a></li>
+                    <li><a href="#contact">اتصل بنا</a></li>
+                </ul>
+                <div class="auth-buttons" id="desktop">
+                    <a href="#" class="btn btn-outline">تسجيل الدخول</a>
+                    <a href="#" class="btn btn-primary">تجربة مجانية</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- الصفحة الرئيسية -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>حلل أداء وسائل التواصل الاجتماعي بذكاء</h1>
+            <p>منصة متكاملة لتحليل أداء حساباتك على وسائل التواصل الاجتماعي وتقديم رؤى قابلة للتنفيذ لتعزيز engagement وزيادة المتابعين</p>
+            <a href="#pricing" id="heddin-btn-desk" class="btn btn-primary">ابدأ الآن</a>
+            <div class="auth-buttons" id="mobile">
+                    <a href="#" class="btn btn-outline">تسجيل الدخول</a>
+                    <a href="#" class="btn btn-primary">تجربة مجانية</a>
+                </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">ميزات منصتنا</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>تحليل أداء متقدم</h3>
+                    <p>احصل على تقارير مفصلة عن أداء منشوراتك، ومعدلات التفاعل، وأفضل أوقات النشر لتحقيق أقصى engagement.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>تحليل الجمهور</h3>
+                    <p>تعرف على جمهورك بشكل أعمق من خلال تحليل ديموغرافي مفصل، وتحديد اهتماماتهم وسلوكهم على المنصة.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>مقارنة بالأخرين</h3>
+                    <p>قارن أداء حسابك بحسابات المنافسين وتعلم من استراتيجياتهم الناجحة لتحسين أدائك.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>تحليل الهاشتاقات</h3>
+                    <p>حدد الهاشتاقات الأكثر شيوعاً وتأثيراً في مجالك لزيادة وصول منشوراتك وجذب متابعين جدد.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3>التنبيهات الذكية</h3>
+                    <p>احصل على تنبيهات فورية عند حدوث تغييرات مهمة في أداء حسابك أو حسابات المنافسين.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>لوحة تحكم متكاملة</h3>
+                    <p>لوحة تحكم سهلة الاستخدام تعرض جميع البيانات والتحليلات المهمة في مكان واحد.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة التسعير -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <h2 class="section-title">باقاتنا السعرية</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>الاستخدام الشخصي</h3>
+                    <div class="price">19.99 <span>$/شهر</span></div>
+                    <p>مناسبة للأفراد وصناع المحتوى المستقلين</p>
+                    <ul class="pricing-features">
+                        <li>تحليل 3 حسابات كحد أقصى</li>
+                        <li>تقارير أساسية عن الأداء</li>
+                        <li>تحليل 5 منشورات يومياً</li>
+                        <li>دعم فني عبر البريد الإلكتروني</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">اختر هذه الباقة</a>
+                </div>
+                <div class="pricing-card popular">
+                    <h3>الشركات الصغيرة</h3>
+                    <div class="price">49.99 <span>$/شهر</span></div>
+                    <p>مناسبة للشركات الصغيرة والمتوسطة</p>
+                    <ul class="pricing-features">
+                        <li>تحليل 10 حسابات كحد أقصى</li>
+                        <li>تقارير متقدمة عن الأداء</li>
+                        <li>تحليل غير محدود للمنشورات</li>
+                        <li>مقارنة مع 5 منافسين</li>
+                        <li>دعم فني سريع</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">اختر هذه الباقة</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>الشركات الكبيرة</h3>
+                    <div class="price">99.99 <span>$/شهر</span></div>
+                    <p>مناسبة للوكالات والشركات الكبيرة</p>
+                    <ul class="pricing-features">
+                        <li>تحليل عدد غير محدود من الحسابات</li>
+                        <li>تقارير شاملة وتقارير مخصصة</li>
+                        <li>جميع ميزات التحليل المتقدم</li>
+                        <li>مقارنة مع عدد غير محدود من المنافسين</li>
+                        <li>دعم فني على مدار الساعة</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">اختر هذه الباقة</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة الاتصال -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">اتصل بنا</h2>
+            <div class="contact-grid">
+                
+                <div class="contact-form">
+                    <h3>أرسل لنا رسالة</h3>
+                    <form>
+                        <div class="form-group">
+                            <label for="name">الاسم الكامل</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">الموضوع</label>
+                            <input type="text" id="subject" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">الرسالة</label>
+                            <textarea id="message" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">إرسال الرسالة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <span>SocialInsight</span>
+                    <span class="logo-icon" style="display:none;">📊</span>
+                    
+                </div>
+                
+                <div class="contact-info" style="width:100vw;">
+                    <hr width="100%" style="margin-bottom:3vh">
+                    <h3>معلومات الاتصال</h3>
+                    <ul class="contact-details">
+                        <li>
+                            <span class="contact-icon">📧</span>
+                            <span>analytic.reson.com</span>
+                        </li>
+                        <li>
+                            <span class="contact-icon">📞</span>
+                            <span>+963 981 082 693</span>
+                        </li>
+                        <!-- <li>
+                            <span class="contact-icon">📍</span>
+                            <span>سوريا - ريف دمشق - حرستا</span>
+                        </li>
+                        <li>
+                            <span class="contact-icon">🕒</span>
+                            <span>الأحد - الخميس: 8 ص - 5 م</span>
+                        </li>  -->
+                    </ul>
+                </div>
+                <div id="sections">
+                    <hr width="100%">
+                    <h3>الاقسام</h3></div>
+                <ul class="footer-links">
+                    <li><a href="#home">الرئيسية</a></li>
+                    <li><a href="#features">الميزات</a></li>
+                    <li><a href="#pricing">الباقات</a></li>
+                    <li><a href="#contact">اتصل بنا</a></li>
+                    <li><a href="#">شروط الخدمة</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+                <p class="copyright">© 2023 SocialInsight. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Form submission handling
+        const contactForm = document.querySelector('.contact-form form');
+        if(contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('شكراً لتواصلك معنا! سنرد على رسالتك في أقرب وقت ممكن.');
+                this.reset();
+            });
+        }
+
+        // Scroll animation for cards
+        function checkScroll() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            const pricingCards = document.querySelectorAll('.pricing-card');
+            const contactForm = document.querySelector('.contact-form');
+            
+            const triggerBottom = window.innerHeight * 0.8;
+            
+            featureCards.forEach((card, index) => {
+                const cardTop = card.getBoundingClientRect().top;
+                if(cardTop < triggerBottom) {
+                    setTimeout(() => {
+                        card.classList.add('show');
+                    }, index * 150); // تأخير لكل كارد لإنشاء تأثير تسلسلي
+                }
+            });
+            
+            pricingCards.forEach((card, index) => {
+                const cardTop = card.getBoundingClientRect().top;
+                if(cardTop < triggerBottom) {
+                    setTimeout(() => {
+                        card.classList.add('show');
+                    }, index * 150);
+                }
+            });
+            
+            if(contactForm) {
+                const formTop = contactForm.getBoundingClientRect().top;
+                if(formTop < triggerBottom) {
+                    contactForm.classList.add('show');
+                }
+            }
+        }
+        
+        // تشغيل الدالة عند التمرير وعند تحميل الصفحة
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('load', checkScroll);
+    </script>
+</body>
+</html>
