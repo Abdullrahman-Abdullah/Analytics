@@ -40,6 +40,7 @@
         
         header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            
             color: white;
             padding: 1rem 0;
             position: sticky;
@@ -59,11 +60,22 @@
             font-weight: bold;
             display: flex;
             align-items: center;
+            
         }
         
         .logo-icon {
-            margin-left: 10px;
-            font-size: 2rem;
+            margin-left:5px;
+            margin-top:5%;
+            font-size: 0.8rem;
+            width:80px;
+            
+            
+        }
+        #mobile-co-name{
+            display:none;
+        }
+        #desktop-co-name{
+            display:flex;
         }
         
         .nav-links {
@@ -431,6 +443,24 @@
         @media (max-width: 768px) {
             header{
                 position: relative;
+                background: var(--secondary-color);
+            }
+            #co-name{
+                border-bottom:solid 1px white;
+                border-left:solid 1px white;
+                position:relative;
+            }
+            
+            .logo-icon {
+                position:absolute;
+                bottom:-30%;
+                right:5%;
+                margin-left:10px;
+                margin-top:12%;
+                font-size: .8rem;
+                width:auto;
+                background-color:var(--secondary-color);
+             
             }
             #sections hr {
                 display: flex;
@@ -443,6 +473,12 @@
                 visibility:hidden;
             }
             #desktop{
+                display:none;
+            }
+            #mobile-co-name{
+                display:flex;
+            }
+            #desktop-co-name{
                 display:none;
             }
             #mobile{
@@ -517,8 +553,10 @@
         <div class="container">
             <nav>
                 <div class="logo">
-                    <span>SocialInsight</span>
-                    <span class="logo-icon">From Reson</span>
+                    <span class="logo-icon" id="desktop-co-name">From Reson</span>
+                    <span id="co-name" >SocialInsight  <span class="logo-icon" id="mobile-co-name">From Reson</span> </span>
+                    
+                    
                 </div>
                 <ul class="nav-links">
                     <li><a href="#home">الرئيسية</a></li>
