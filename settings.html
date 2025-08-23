@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات - SocialInsight</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #ff9e00;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark-color);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* زر القائمة للهاتف */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            box-shadow: var(--box-shadow);
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 1.5rem 1rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-logo i {
+            margin-left: 10px;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-nav a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .sidebar-nav i {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        /* إعدادات الحساب */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        
+        .settings-sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .settings-nav {
+            list-style: none;
+        }
+        
+        .settings-nav li {
+            margin-bottom: 5px;
+        }
+        
+        .settings-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--dark-color);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+        
+        .settings-nav a:hover, .settings-nav a.active {
+            background-color: #f0f2ff;
+            color: var(--primary-color);
+        }
+        
+        .settings-nav i {
+            margin-left: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .settings-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .settings-section {
+            margin-bottom: 40px;
+        }
+        
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2ff;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .form-hint {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: 5px;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-text {
+            flex: 1;
+        }
+        
+        .toggle-text h4 {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .toggle-text p {
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        /* إعدادات المظهر */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .theme-option {
+            border: 2px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-option:hover, .theme-option.active {
+            border-color: var(--primary-color);
+        }
+        
+        .theme-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .theme-light {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .theme-dark {
+            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+        }
+        
+        .theme-blue {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        }
+        
+        /* إعدادات الإشعارات */
+        .notification-category {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f2ff;
+        }
+        
+        .notification-category:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .notification-category h4 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+        
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f9f9f9;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-info {
+            flex: 1;
+        }
+        
+        .notification-info h5 {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .notification-info p {
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        /* إعدادات الخصوصية */
+        .privacy-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f2ff;
+        }
+        
+        .privacy-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .privacy-item h4 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .privacy-item p {
+            margin-bottom: 15px;
+            color: #777;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .radio-option input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* إعدادات الاشتراك */
+        .subscription-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .subscription-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .subscription-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .subscription-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .subscription-features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .subscription-features i {
+            margin-left: 10px;
+        }
+        
+        .subscription-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #f0f2ff;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* إعدادات متقدمة */
+        .advanced-option {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .advanced-option h4 {
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .advanced-option h4 i {
+            margin-left: 10px;
+            color: var(--primary-color);
+        }
+        
+        .advanced-option p {
+            margin-bottom: 15px;
+            color: #777;
+        }
+        
+        .danger-zone {
+            border-left: 4px solid #ef4444;
+            background: #fef2f2;
+        }
+        
+        .danger-zone h4 {
+            color: #ef4444;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        /* أزرار الحفظ */
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn-save {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save:hover {
+            background: var(--secondary-color);
+        }
+        
+        .btn-cancel {
+            background: #f8f9fa;
+            color: #777;
+            border: 1px solid #ddd;
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cancel:hover {
+            background: #e9ecef;
+        }
+        
+        /* responsive design */
+        @media (max-width: 1024px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .settings-sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-200%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(-42%);
+            }
+            
+            .main-content {
+                margin-right: 0;
+                padding: 15px;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .theme-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .subscription-actions {
+                flex-direction: column;
+            }
+            
+            .settings-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- زر القائمة للهاتف -->
+    <button class="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+                SocialInsight
+            </div>
+            <button class="close-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li><a href="demo.html"><i class="fas fa-th-large"></i> لوحة التحكم</a></li>
+            <li><a href="analytic.html"><i class="fas fa-chart-bar"></i> التحليلات</a></li>
+            <li><a href="followers.html"><i class="fas fa-users"></i> المتابعون</a></li>
+            <li><a href="posts.html"><i class="fas fa-image"></i> المنشورات</a></li>
+            <li><a href="scheduling.html"><i class="fas fa-calendar-alt"></i> الجدولة</a></li>
+            <li><a href="reports.html"><i class="fas fa-file-alt"></i> التقارير</a></li>
+            <li><a href="#" class="active"><i class="fas fa-cog"></i> الإعدادات</a></li>
+        </ul>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>الإعدادات</h1>
+            <div class="user-menu">
+                <div class="user-avatar">م</div>
+                <span>محمد أحمد</span>
+            </div>
+        </div>
+
+        <!-- محتوى الإعدادات -->
+        <div class="settings-container">
+            <!-- الشريط الجانبي للإعدادات -->
+            <div class="settings-sidebar">
+                <ul class="settings-nav">
+                    <li><a href="#" class="active"><i class="fas fa-user-circle"></i> الحساب</a></li>
+                    <li><a href="#"><i class="fas fa-bell"></i> الإشعارات</a></li>
+                    <li><a href="#"><i class="fas fa-paint-brush"></i> المظهر</a></li>
+                    <li><a href="#"><i class="fas fa-lock"></i> الخصوصية</a></li>
+                    <li><a href="#"><i class="fas fa-credit-card"></i> الاشتراك</a></li>
+                    <li><a href="#"><i class="fas fa-plug"></i> التكاملات</a></li>
+                    <li><a href="#"><i class="fas fa-cogs"></i> متقدم</a></li>
+                </ul>
+            </div>
+
+            <!-- محتوى الإعدادات -->
+            <div class="settings-content">
+                <!-- إعدادات الحساب -->
+                <div class="settings-section">
+                    <h2 class="section-title">معلومات الحساب</h2>
+                    
+                    <div class="form-group">
+                        <label>صورة الملف الشخصي</label>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="user-avatar" style="width: 80px; height: 80px; font-size: 1.5rem;">م</div>
+                            <button class="btn-save" style="padding: 10px 20px;">تغيير الصورة</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" class="form-control" value="محمد أحمد">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>اسم المستخدم</label>
+                        <input type="text" class="form-control" value="@mohammed">
+                        <div class="form-hint">هذا هو المعرف الذي سيراك به الآخرون على المنصة</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" class="form-control" value="mohammed@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="tel" class="form-control" value="+963 987 654 321">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الموقع</label>
+                        <input type="text" class="form-control" value="سوريا">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>اللغة</label>
+                        <select class="form-control">
+                            <option selected>العربية</option>
+                            <option>English</option>
+                            <option>Français</option>
+                            <option>Español</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- إعدادات المظهر -->
+                <div class="settings-section">
+                    <h2 class="section-title">إعدادات المظهر</h2>
+                    
+                    <div class="toggle-label">
+                        <div class="toggle-text">
+                            <h4>الوضع الداكن</h4>
+                            <p>تفعيل المظهر الداكن لتجربة استخدام أفضل في الإضاءة المنخفضة</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-label">
+                        <div class="toggle-text">
+                            <h4>تغيير الألوان تلقائياً</h4>
+                            <p>تغيير ألوان الواجهة بناءً على الوقت من اليوم</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>السمة المفضلة</label>
+                        <div class="theme-options">
+                            <div class="theme-option active">
+                                <div class="theme-preview theme-light"></div>
+                                <span>فاتح</span>
+                            </div>
+                            <div class="theme-option">
+                                <div class="theme-preview theme-dark"></div>
+                                <span>داكن</span>
+                            </div>
+                            <div class="theme-option">
+                                <div class="theme-preview theme-blue"></div>
+                                <span>أزرق</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إعدادات الإشعارات -->
+                <div class="settings-section">
+                    <h2 class="section-title">إعدادات الإشعارات</h2>
+                    
+                    <div class="notification-category">
+                        <h4>إشعارات البريد الإلكتروني</h4>
+                        
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h5>التقارير الأسبوعية</h5>
+                                <p>احصل على تقرير أسبوعي بأداء حسابك</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h5>نشاط المتابعين</h5>
+                                <p>إشعارات عند تفاعل المتابعين مع محتواك</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-category">
+                        <h4>إشعارات التطبيق</h4>
+                        
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h5>الإشعارات الصوتية</h5>
+                                <p>تشغيل صوت عند إستلام إشعارات جديدة</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h5>الإشعارات المنبثقة</h5>
+                                <p>عرض الإشعارات كرسائل منبثقة على الشاشة</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار الحفظ -->
+                <div class="settings-actions">
+                    <button class="btn-cancel">إلغاء</button>
+                    <button class="btn-save">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // فتح وإغلاق القائمة الجانبية على الهاتف
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const closeSidebar = document.querySelector('.close-sidebar');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                menuToggle.style.display="none";
+            });
+            
+            closeSidebar.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                menuToggle.style.display="flex";
+            });
+            
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(event.target) && 
+                    !menuToggle.contains(event.target) && 
+                    sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    menuToggle.style.display="flex";
+                }
+            });
+            
+            // تبديل خيارات السمة
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.theme-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // التنقل بين أقسام الإعدادات
+            document.querySelectorAll('.settings-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    document.querySelectorAll('.settings-nav a').forEach(l => {
+                        l.classList.remove('active');
+                    });
+                    
+                    this.classList.add('active');
+                    
+                    // هنا سيتم تحميل محتوى القسم المحدد
+                    // (في تطبيق حقيقي، سيتم تحميل المحتوى عبر AJAX أو تغيير العرض)
+                });
+            });
+        });
+    </script>
+</body>
+</html>
