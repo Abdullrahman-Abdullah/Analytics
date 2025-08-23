@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="images/logo.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SocialInsight - أداة تحليلات وسائل التواصل الاجتماعي</title>
     <style>
@@ -77,6 +78,9 @@
         #desktop-co-name{
             display:flex;
         }
+        #image , #image img{
+        display:none;
+    }
         
         .nav-links {
             display: flex;
@@ -462,6 +466,19 @@
                 background-color:var(--secondary-color);
              
             }
+            #image , #image img{
+                display:block;
+            }
+            #image{
+     
+                width:46svw;
+                height:22svh;
+            }
+            #image img{
+                background-position:center;
+                width:100%;
+                height:100%;
+            }
             #sections hr {
                 display: flex;
                 margin-bottom: 5.5vh;
@@ -707,7 +724,9 @@
         <div class="container">
             <div class="footer-content">
                 <div class="logo">
-                    <span>SocialInsight</span>
+                    <div id="image">
+                    <img src="images/logo.png">
+                    </div>
                     <span class="logo-icon" style="display:none;">📊</span>
                     
                 </div>
