@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل المتابعين - SocialInsight</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #ff9e00;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark-color);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* زر القائمة للهاتف */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            box-shadow: var(--box-shadow);
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 1.5rem 1rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-logo i {
+            margin-left: 10px;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-nav a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .sidebar-nav i {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        /* فلاتر المتابعين */
+        .followers-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background: white;
+            font-size: 1rem;
+        }
+        
+        .search-box {
+            position: relative;
+            min-width: 250px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .apply-filters {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            align-self: flex-end;
+            transition: all 0.3s ease;
+        }
+        
+        .apply-filters:hover {
+            background: var(--secondary-color);
+        }
+        
+        /* نظرة عامة على المتابعين */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .overview-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .overview-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .overview-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .overview-card .change {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .change.positive {
+            color: #10b981;
+        }
+        
+        .change.negative {
+            color: #ef4444;
+        }
+        
+        .overview-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2rem;
+            opacity: 0.1;
+            color: var(--primary-color);
+        }
+        
+        /* قسم تحليل المتابعين */
+        .section-title {
+            font-size: 1.5rem;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            color: var(--secondary-color);
+        }
+        
+        /* تحليل التفاعل */
+        .engagement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .engagement-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .engagement-card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .engagement-card h3 i {
+            margin-left: 10px;
+            color: var(--accent-color);
+        }
+        
+        .engagement-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .engagement-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .engagement-label {
+            font-weight: 500;
+        }
+        
+        .engagement-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* تحليل الفيديوهات */
+        .video-analytics {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .video-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .video-metric {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .video-metric .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .video-metric .label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* خريطة الحرارة للتفاعل */
+        .heatmap-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .heatmap-cell {
+            height: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .heatmap-legend {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        /* المتابعين النشطين */
+        .active-followers {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .follower-list {
+            margin-top: 20px;
+        }
+        
+        .follower-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .follower-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .follower-item:last-child {
+            border-bottom: none;
+        }
+        
+        .follower-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        
+        .follower-info {
+            flex: 1;
+        }
+        
+        .follower-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .follower-details {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .follower-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: #f3f4f6;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* تحليل الاهتمامات */
+        .interests-analysis {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .interests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .interest-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+        
+        .interest-item:hover {
+            background: #e9ecef;
+        }
+        
+        .interest-icon {
+            margin-left: 10px;
+            color: var(--primary-color);
+        }
+        
+        .interest-name {
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .interest-score {
+            background: var(--primary-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* تحليل المشاهدات */
+        .views-analysis {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .views-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .view-metric {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .view-metric .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .view-metric .label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* الرسوم البيانية */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-btn {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        /* responsive design */
+        @media (max-width: 1024px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-200%);
+            }
+            .menu-toggle{
+                transition: transform 2s;
+                transition:  2s ease;
+                
+                display:flex;
+                
+            }
+            
+            .sidebar.active {
+                transform: translateX(-41%);
+            }
+            
+            .main-content {
+                margin-right: 0;
+                padding: 15px;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .overview-grid,
+            .engagement-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .followers-filters {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .follower-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- زر القائمة للهاتف -->
+    <button class="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+                SocialInsight
+            </div>
+            <button class="close-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li><a href="demo.html"><i class="fas fa-th-large"></i> لوحة التحكم</a></li>
+            <li><a href="analytic.html"><i class="fas fa-chart-bar"></i> التحليلات</a></li>
+            <li><a href="followers.html" class="active"><i class="fas fa-users"></i> المتابعون</a></li>
+            <li><a href="#"><i class="fas fa-image"></i> المنشورات</a></li>
+            <li><a href="#"><i class="fas fa-calendar-alt"></i> الجدولة</a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> التقارير</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> الإعدادات</a></li>
+        </ul>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>تحليل المتابعين</h1>
+            <div class="user-menu">
+                <div class="user-avatar">م</div>
+                <span>محمد أحمد</span>
+            </div>
+        </div>
+
+        <!-- فلاتر المتابعين -->
+        <div class="followers-filters">
+            <div class="filter-group">
+                <label>نوع المتابعين</label>
+                <select class="filter-select">
+                    <option selected>جميع المتابعين</option>
+                    <option>المتابعين الجدد</option>
+                    <option>المتابعين النشطين</option>
+                    <option>المتابعين القدامى</option>
+                    <option>المتابعين المؤثرين</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>الفترة الزمنية</label>
+                <select class="filter-select">
+                    <option>أخر 7 أيام</option>
+                    <option selected>أخر 30 يوم</option>
+                    <option>أخر 90 يوم</option>
+                    <option>هذا الشهر</option>
+                </select>
+            </div>
+            
+            <div class="filter-group search-box">
+                <label>بحث عن متابع</label>
+                <div style="position: relative;">
+                    <input type="text" class="search-input" placeholder="ابحث باسم المستخدم">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="apply-filters">تطبيق الفلاتر</button>
+        </div>
+
+        <!-- نظرة عامة على المتابعين -->
+        <div class="overview-grid">
+            <div class="overview-card">
+                <div class="overview-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>إجمالي المتابعين</h3>
+                <div class="value">24,583</div>
+                <div class="change positive">↑ 254 (1.04%)</div>
+            </div>
+            
+            <div class="overview-card">
+                <div class="overview-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>متابعين جدد</h3>
+                <div class="value">1,254</div>
+                <div class="change positive">↑ 12.4%</div>
+            </div>
+            
+            <div class="overview-card">
+                <div class="overview-icon">
+                    <i class="fas fa-user-minus"></i>
+                </div>
+                <h3>متابعين غير متابعين</h3>
+                <div class="value">327</div>
+                <div class="change negative">↓ 2.1%</div>
+            </div>
+            
+            <div class="overview-card">
+                <div class="overview-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>معدل التفاعل</h3>
+                <div class="value">7.8%</div>
+                <div class="change positive">↑ 0.6%</div>
+            </div>
+        </div>
+
+        <!-- تحليل التفاعل -->
+        <h2 class="section-title">تحليل تفاعل المتابعين</h2>
+        <div class="engagement-grid">
+            <div class="engagement-card">
+                <h3><i class="fas fa-clock"></i> أوقات الذروة</h3>
+                <div class="engagement-item">
+                    <span class="engagement-label">أعلى تفاعل</span>
+                    <span class="engagement-value">7:00-9:00 مساءً</span>
+                </div>
+                <div class="engagement-item">
+                    <span class="engagement-label">أقل تفاعل</span>
+                    <span class="engagement-value">3:00-5:00 صباحًا</span>
+                </div>
+                <div class="engagement-item">
+                    <span class="engagement-label">متوسط وقت المشاهدة</span>
+                    <span class="engagement-value">53 ثانية/منشور</span>
+                </div>
+                <div class="engagement-item">
+                    <span class="engagement-label">معدل الإكمال</span>
+                    <span class="engagement-value">72%</span>
+                </div>
+            </div>
+            
+            <div class="engagement-card">
+                <h3><i class="fas fa-chart-pie"></i> توزيع التفاعل</h3>
+                <div class="engagement-item">
+                    <span class="engagement-label">الإعجابات</span>
+                    <span class="engagement-value">65%</span>
+                </div>
+                <div class="engagement-item">
+                    <span class="engagement-label">التعليقات</span>
+                    <span class="engagement-value">15%</span>
+                </div>
+                <div class="engagement-item">
+                    <span class="engagement-label">الحفظ</span>
+                    <span class="engagement-value">12%</span>
+                </div>
+                <div class="engagement-item">
+                    <span class="engagement-label">المشاركة</span>
+                    <span class="engagement-value">8%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- خريطة الحرارة للتفاعل -->
+        <h2 class="section-title">خريطة حرارة التفاعل</h2>
+        <div class="heatmap-container">
+            <p>توزيع تفاعل المتابعين خلال أيام الأسبوع</p>
+            <div class="heatmap">
+                <div class="heatmap-cell" style="background-color: #e0e7ff; color: #333;">الأحد</div>
+                <div class="heatmap-cell" style="background-color: #c7d2fe; color: #333;">الاثنين</div>
+                <div class="heatmap-cell" style="background-color: #a5b4fc; color: white;">الثلاثاء</div>
+                <div class="heatmap-cell" style="background-color: #818cf8; color: white;">الأربعاء</div>
+                <div class="heatmap-cell" style="background-color: #6366f1; color: white;">الخميس</div>
+                <div class="heatmap-cell" style="background-color: #4f46e5; color: white;">الجمعة</div>
+                <div class="heatmap-cell" style="background-color: #4338ca; color: white;">السبت</div>
+                
+                <!-- الصف الثاني -->
+                <div class="heatmap-cell" style="background-color: #c7d2fe; color: #333;">8-10 ص</div>
+                <div class="heatmap-cell" style="background-color: #a5b4fc; color: white;">12-2 م</div>
+                <div class="heatmap-cell" style="background-color: #818cf8; color: white;">4-6 م</div>
+                <div class="heatmap-cell" style="background-color: #6366f1; color: white;">7-9 م</div>
+                <div class="heatmap-cell" style="background-color: #4f46e5; color: white;">10-12 م</div>
+                <div class="heatmap-cell" style="background-color: #4338ca; color: white;">1-3 ص</div>
+                <div class="heatmap-cell" style="background-color: #3730a3; color: white;">4-6 ص</div>
+            </div>
+            
+            <div class="heatmap-legend">
+                <div class="legend-item">
+                    <span>تفاعل منخفض</span>
+                    <div class="legend-color" style="background-color: #e0e7ff;"></div>
+                </div>
+                <div class="legend-item">
+                    <span>تفاعل متوسط</span>
+                    <div class="legend-color" style="background-color: #a5b4fc;"></div>
+                </div>
+                <div class="legend-item">
+                    <span>تفاعل عالي</span>
+                    <div class="legend-color" style="background-color: #6366f1;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- المتابعين النشطين -->
+        <h2 class="section-title">المتابعين الأكثر نشاطاً</h2>
+        <div class="active-followers">
+            <p>المتابعين الذين تفاعلوا مع محتواك خلال الـ 7 أيام الماضية</p>
+            <div class="follower-list">
+                <div class="follower-item">
+                    <div class="follower-avatar">س</div>
+                    <div class="follower-info">
+                        <div class="follower-name">@سالم_الغامدي</div>
+                        <div class="follower-details">تفاعل مع 12 منشور | 24 تعليق</div>
+                    </div>
+                    <div class="follower-actions">
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+                
+                <div class="follower-item">
+                    <div class="follower-avatar">م</div>
+                    <div class="follower-info">
+                        <div class="follower-name">@منيرة_العتيبي</div>
+                        <div class="follower-details">تفاعل مع 9 منشورات | 18 إعجاب</div>
+                    </div>
+                    <div class="follower-actions">
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+                
+                <div class="follower-item">
+                    <div class="follower-avatar">ف</div>
+                    <div class="follower-info">
+                        <div class="follower-name">@فهد_السعدون</div>
+                        <div class="follower-details">تفاعل مع 7 منشورات | 5 تعليقات</div>
+                    </div>
+                    <div class="follower-actions">
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+                
+                <div class="follower-item">
+                    <div class="follower-avatar">ل</div>
+                    <div class="follower-info">
+                        <div class="follower-name">@لينا_الفهيد</div>
+                        <div class="follower-details">تفاعل مع 6 منشورات | 9 حفظ</div>
+                    </div>
+                    <div class="follower-actions">
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تحليل الاهتمامات -->
+        <h2 class="section-title">اهتمامات المتابعين</h2>
+        <div class="interests-analysis">
+            <p>المواضيع والاهتمامات الأكثر شيوعاً بين متابعيك</p>
+            <div class="interests-grid">
+                <div class="interest-item">
+                    <div class="interest-icon"><i class="fas fa-camera"></i></div>
+                    <div class="interest-name">التصوير الفوتوغرافي</div>
+                    <div class="interest-score">87%</div>
+                </div>
+                
+                <div class="interest-item">
+                    <div class="interest-icon"><i class="fas fa-plane"></i></div>
+                    <div class="interest-name">السفر</div>
+                    <div class="interest-score">76%</div>
+                </div>
+                
+                <div class="interest-item">
+                    <div class="interest-icon"><i class="fas fa-utensils"></i></div>
+                    <div class="interest-name">الطعام</div>
+                    <div class="interest-score">68%</div>
+                </div>
+                
+                <div class="interest-item">
+                    <div class="interest-icon"><i class="fas fa-heartbeat"></i></div>
+                    <div class="interest-name">اللياقة البدنية</div>
+                    <div class="interest-score">63%</div>
+                </div>
+                
+                <div class="interest-item">
+                    <div class="interest-icon"><i class="fas fa-music"></i></div>
+                    <div class="interest-name">الموسيقى</div>
+                    <div class="interest-score">59%</div>
+                </div>
+                
+                <div class="interest-item">
+                    <div class="interest-icon"><i class="fas fa-paint-brush"></i></div>
+                    <div class="interest-name">التصميم</div>
+                    <div class="interest-score">54%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تحليل المشاهدات -->
+        <h2 class="section-title">تحليل مشاهدات الفيديو</h2>
+        <div class="views-analysis">
+            <p>أداء مقاطع الفيديو لدى متابعيك</p>
+            <div class="views-metrics">
+                <div class="view-metric">
+                    <span class="value">72%</span>
+                    <span class="label">معدل الإكمال</span>
+                </div>
+                
+                <div class="view-metric">
+                    <span class="value">35%</span>
+                    <span class="label">مشاهدات حتى 50%</span>
+                </div>
+                
+                <div class="view-metric">
+                    <span class="value">24%</span>
+                    <span class="label">إعادة تشغيل</span>
+                </div>
+                
+                <div class="view-metric">
+                    <span class="value">18 ث</span>
+                    <span class="label">متوسط وقت المشاهدة</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- الرسوم البيانية -->
+        <h2 class="section-title">الرسوم البيانية التفصيلية</h2>
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">نمو المتابعين خلال 30 يوم</div>
+                    <div class="chart-actions">
+                        <button class="chart-btn active">أسبوع</button>
+                        <button class="chart-btn">شهر</button>
+                        <button class="chart-btn">3 أشهر</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="followersGrowthChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">توزيع المتابعين حسب العمر والجنس</div>
+                    <div class="chart-actions">
+                        <button class="chart-btn active">العمر</button>
+                        <button class="chart-btn">الجنس</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="demographicsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // فتح وإغلاق القائمة الجانبية على الهاتف
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const closeSidebar = document.querySelector('.close-sidebar');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                menuToggle.style.display="none";
+                menuToggle.style.transform = '.2s ';
+            });
+            
+            closeSidebar.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                menuToggle.style.display="flex";
+                menuToggle.style.transform = '2s ';
+            });
+            
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(event.target) && 
+                    !menuToggle.contains(event.target) && 
+                    sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    menuToggle.style.display="flex";
+                    menuToggle.style.transition = '.2s ';
+                }
+            });
+            
+            // إنشاء الرسوم البيانية
+            createFollowersCharts();
+        });
+        
+        // إنشاء الرسوم البيانية للمتابعين
+        // إنشاء الرسوم البيانية للمتابعين
+    function createFollowersCharts() {
+    // رسم بياني لنمو المتابعين
+    const growthCtx = document.getElementById('followersGrowthChart').getContext('2d');
+    const growthChart = new Chart(growthCtx, {
+        type: 'line',
+        data: {
+            labels: ['1', '5', '10', '15', '20', '25', '30'],
+            datasets: [{
+                label: 'عدد المتابعين',
+                data: [24100, 24250, 24320, 24380, 24420, 24480, 24583],
+                borderColor: '#4361ee',
+                backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // رسم بياني لتوزيع المتابعين حسب العمر والجنس
+    const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
+    const demographicsChart = new Chart(demographicsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['18-24', '25-34', '35-44', '45-54', '55+'],
+            datasets: [
+                {
+                    label: 'ذكور',
+                    data: [32, 28, 15, 8, 5],
+                    backgroundColor: '#4361ee'
+                },
+                {
+                    label: 'إناث',
+                    data: [35, 30, 12, 7, 4],
+                    backgroundColor: '#f72585'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // إضافة أحداث لأزرار تغيير نوع الرسم البياني
+    const chartButtons = document.querySelectorAll('.chart-btn');
+    chartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // إزالة النشاط من جميع الأزرار
+            chartButtons.forEach(btn => btn.classList.remove('active'));
+            // إضافة النشاط للزر المحدد
+            this.classList.add('active');
+            
+            // هنا يمكنك تغيير البيانات حسب الزر المحدد
+            // هذا مثال بسيط للتغيير بين البيانات
+            if (this.textContent === 'الجنس') {
+                demographicsChart.data.datasets = [
+                    {
+                        label: 'ذكور',
+                        data: [45, 55],
+                        backgroundColor: ['#4361ee', '#f72585']
+                    }
+                ];
+                demographicsChart.data.labels = ['ذكور', 'إناث'];
+                demographicsChart.update();
+            } else {
+                demographicsChart.data.datasets = [
+                    {
+                        label: 'ذكور',
+                        data: [32, 28, 15, 8, 5],
+                        backgroundColor: '#4361ee'
+                    },
+                    {
+                        label: 'إناث',
+                        data: [35, 30, 12, 7, 4],
+                        backgroundColor: '#f72585'
+                    }
+                ];
+                demographicsChart.data.labels = ['18-24', '25-34', '35-44', '45-54', '55+'];
+                demographicsChart.update();
+            }
+        });
+    });
+}
+
+// إضافة تأثيرات للبطاقات عند التمرير
+    function addScrollAnimations() {
+    const cards = document.querySelectorAll('.overview-card, .engagement-card, .chart-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    cards.forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(card);
+    });
+}
+
+// تفعيل البحث عن المتابعين
+function setupSearchFunctionality() {
+    const searchInput = document.querySelector('.search-input');
+    const followerItems = document.querySelectorAll('.follower-item');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        followerItems.forEach(item => {
+            const followerName = item.querySelector('.follower-name').textContent.toLowerCase();
+            if (followerName.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+}
+
+// تفعيل أحداث الأزرار
+    function setupButtonEvents() {
+    const applyFiltersBtn = document.querySelector('.apply-filters');
+    
+    applyFiltersBtn.addEventListener('click', function() {
+        // عرض رسالة تأكيد
+        alert('تم تطبيق الفلاتر بنجاح! سيتم تحديث البيانات وفقًا للمعايير المحددة.');
+        
+        // هنا يمكنك إضافة كود لجلب البيانات المصفاة من الخادم
+    });
+    
+    // أحداث أزرار المتابعين
+    const actionButtons = document.querySelectorAll('.action-btn');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-eye')) {
+                alert('جاري عرض تفاصيل المتابع...');
+            } else if (icon.classList.contains('fa-comment')) {
+                alert('جاري فتح محادثة مع المتابع...');
+            }
+        });
+    });
+}
+
+// تهيئة جميع الوظائف عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const closeSidebar = document.querySelector('.close-sidebar');
+    
+    menuToggle.addEventListener('click', function() {
+        sidebar.classList.add('active');
+    });
+    
+    closeSidebar.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+    });
+    
+    // إغلاق القائمة عند النقر خارجها
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !menuToggle.contains(event.target) && 
+            sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+    
+    // استدعاء جميع الوظائف
+    createFollowersCharts();
+    addScrollAnimations();
+    setupSearchFunctionality();
+    setupButtonEvents();
+});
+</script>
+</body>
+</html>
