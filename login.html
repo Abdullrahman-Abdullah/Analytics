@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - SocialInsight</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #ff9e00;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* الهيدر */
+        header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-left: 10px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* محتوى صفحة التسجيل */
+        .auth-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        
+        .auth-box {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .auth-header {
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .auth-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .auth-forms {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+        }
+        
+        .auth-form {
+            padding: 2rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s ease;
+            overflow-y: auto;
+        }
+        
+        .auth-form.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .auth-form.signup-form {
+            transform: translateX(-100%);
+        }
+        
+        .auth-form.signup-form.active {
+            transform: translateX(0);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .input-icon {
+            position: relative;
+        }
+        
+        .input-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+        }
+        
+        .input-icon .form-input {
+            padding-left: 40px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-left: 0.5rem;
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .submit-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .auth-switch-text {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-switch-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+            font-size: 1rem;
+        }
+        
+        .social-auth {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .social-title {
+            position: relative;
+            margin-bottom: 1rem;
+            color: #666;
+        }
+        
+        .social-title::before,
+        .social-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .social-title::before {
+            right: 0;
+        }
+        
+        .social-title::after {
+            left: 0;
+        }
+        
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-btn.google {
+            background: #DB4437;
+        }
+        
+        .social-btn.facebook {
+            background: #4267B2;
+        }
+        
+        .social-btn.twitter {
+            background: #1DA1F2;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .terms-text {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .terms-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+        
+        /* responsive design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            nav ul li {
+                margin: 5px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-box {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .auth-header {
+                padding: 1.5rem;
+            }
+            
+            .auth-form {
+                padding: 1.5rem;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .forgot-password {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- الهيدر -->
+  
+
+    <!-- محتوى صفحة التسجيل -->
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h2 class="auth-title" id="auth-title">تسجيل الدخول</h2>
+                <p class="auth-subtitle" id="auth-subtitle">مرحباً بعودتك! يرجى تسجيل الدخول إلى حسابك</p>
+            </div>
+            
+            <div class="auth-forms">
+                <!-- نموذج تسجيل الدخول -->
+                <form class="auth-form login-form active" id="login-form">
+                    <div class="form-group">
+                        <label for="login-email" class="form-label">البريد الإلكتروني</label>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="login-email" class="form-input" placeholder="أدخل بريدك الإلكتروني" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">كلمة المرور</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="login-password" class="form-input" placeholder="أدخل كلمة المرور" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember-me">
+                            <label for="remember-me">تذكرني</label>
+                        </div>
+                        <a href="#" class="forgot-password">نسيت كلمة المرور؟</a>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">تسجيل الدخول</button>
+                    
+                    <div class="auth-switch">
+                        <p class="auth-switch-text">ليس لديك حساب؟</p>
+                        <button type="button" class="auth-switch-btn" id="switch-to-signup">إنشاء حساب جديد</button>
+                    </div>
+                    
+                    <div class="social-auth">
+                        <p class="social-title">أو تسجيل الدخول باستخدام</p>
+                        <div class="social-buttons">
+                            <a href="#" class="social-btn google"><i class="fab fa-google"></i></a>
+                            <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-btn twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- نموذج إنشاء حساب -->
+                <form class="auth-form signup-form" id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-name" class="form-label">الاسم الكامل</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="signup-name" class="form-input" placeholder="أدخل اسمك الكامل" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email" class="form-label">البريد الإلكتروني</label>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="signup-email" class="form-input" placeholder="أدخل بريدك الإلكتروني" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="signup-password" class="form-label">كلمة المرور</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="signup-password" class="form-input" placeholder="كلمة المرور" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-confirm-password" class="form-label">تأكيد كلمة المرور</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="signup-confirm-password" class="form-input" placeholder="تأكيد كلمة المرور" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-phone" class="form-label">رقم الهاتف</label>
+                        <div class="input-icon">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="signup-phone" class="form-input" placeholder="أدخل رقم هاتفك">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="agree-terms" required>
+                            <label for="agree-terms">أوافق على <a href="#">الشروط والأحكام</a> و <a href="#">سياسة الخصوصية</a></label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">إنشاء حساب</button>
+                    
+                    <div class="auth-switch">
+                        <p class="auth-switch-text">هل لديك حساب بالفعل؟</p>
+                        <button type="button" class="auth-switch-btn" id="switch-to-login">تسجيل الدخول</button>
+                    </div>
+                    
+                    <div class="social-auth">
+                        <p class="social-title">أو إنشاء حساب باستخدام</p>
+                        <div class="social-buttons">
+                            <a href="#" class="social-btn google"><i class="fab fa-google"></i></a>
+                            <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-btn twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    
+                    <p class="terms-text">بالنقر على "إنشاء حساب"، فإنك توافق على <a href="#">شروط الخدمة</a> و <a href="#">سياسة الخصوصية</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const switchToSignupBtn = document.getElementById('switch-to-signup');
+            const switchToLoginBtn = document.getElementById('switch-to-login');
+            const authTitle = document.getElementById('auth-title');
+            const authSubtitle = document.getElementById('auth-subtitle');
+            
+            // التبديل إلى نموذج إنشاء حساب
+            switchToSignupBtn.addEventListener('click', function() {
+                loginForm.classList.remove('active');
+                setTimeout(() => {
+                    signupForm.classList.add('active');
+                    authTitle.textContent = 'إنشاء حساب';
+                    authSubtitle.textContent = 'انضم إلينا وابدأ رحلتك مع SocialInsight';
+                }, 300);
+            });
+            
+            // التبديل إلى نموذج تسجيل الدخول
+            switchToLoginBtn.addEventListener('click', function() {
+                signupForm.classList.remove('active');
+                setTimeout(() => {
+                    loginForm.classList.add('active');
+                    authTitle.textContent = 'تسجيل الدخول';
+                    authSubtitle.textContent = 'مرحباً بعودتك! يرجى تسجيل الدخول إلى حسابك';
+                }, 300);
+            });
+            
+            // إرسال نموذج تسجيل الدخول
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // في التطبيق الحقيقي، سيتم إرسال البيانات إلى الخادم
+                alert('تم تسجيل الدخول بنجاح!');
+                window.location.href = 'index.html';
+            });
+            
+            // إرسال نموذج إنشاء حساب
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+                
+                if (password !== confirmPassword) {
+                    alert('كلمة المرور غير متطابقة!');
+                    return;
+                }
+                
+                // في التطبيق الحقيقي، سيتم إرسال البيانات إلى الخادم
+                alert('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.');
+                switchToLoginBtn.click();
+            });
+        });
+    </script>
+</body>
+</html>
