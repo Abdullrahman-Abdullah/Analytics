@@ -33,22 +33,26 @@
             display: flex;
             flex-direction: column;
         }
-        
+           
         /* الهيدر */
-        header {
+          header {
+           /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        
             color: white;
-            padding: 1rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--box-shadow);
         }
         
         .header-container {
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            
         }
         
         .logo {
@@ -58,16 +62,15 @@
             align-items: center;
         }
         
-      
+  
         
         /* محتوى صفحة التسجيل */
         .auth-container {
-            
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: .8rem 1rem; 
+            padding: .5rem 1rem;
         }
         
         .auth-box {
@@ -99,7 +102,7 @@
         
         .auth-forms {
             position: relative;
-            min-height: 70svh;
+            height: 500px;
             overflow: hidden;
         }
         
@@ -326,9 +329,32 @@
         
         /* responsive design */
         @media (max-width: 768px) {
+             header{
+                 
+                 position: relative;
+             }
             .header-container {
                 flex-direction: column;
                 text-align: center;
+            }
+            #co-name{
+                border-bottom:solid 1px white;
+                border-left:solid 1px white;
+                position:relative;
+                display:flex;
+            }
+            
+            .logo-icon {
+                position:absolute;
+                bottom:-30%;
+                right:5%;
+                margin-left:10px;
+                margin-top:12%;
+                font-size: .8rem;
+                width:auto;
+                background: linear-gradient(67.5deg, #3f35c8 0%, #3c26b9 100%);
+                
+             
             }
             
             nav ul {
@@ -376,10 +402,13 @@
       <header>
         <div class="header-container">
             <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                SocialInsight
+                
+                <span id="co-name" >SocialInsight  <span class="logo-icon" id="mobile-co-name">From Reson</span> </span>
+                    
+                
+                
             </div>
-        
+          
         </div>
     </header>
 
@@ -542,7 +571,7 @@
                 e.preventDefault();
                 // في التطبيق الحقيقي، سيتم إرسال البيانات إلى الخادم
                 alert('تم تسجيل الدخول بنجاح!');
-                window.location.href = 'index.html';
+                window.location.href = 'demo.html';
             });
             
             // إرسال نموذج إنشاء حساب
