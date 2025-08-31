@@ -539,6 +539,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Load required scripts
+            loadScript('js/config.js');
+            loadScript('js/auth.js');
+            loadScript('js/utils.js');
+            
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
             const switchToSignupBtn = document.getElementById('switch-to-signup');
@@ -569,27 +574,125 @@
             // إرسال نموذج تسجيل الدخول
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                // في التطبيق الحقيقي، سيتم إرسال البيانات إلى الخادم
-                alert('تم تسجيل الدخول بنجاح!');
-                window.location.href = 'demo.html';
+                
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                // Validate inputs
+                if (!email || !password) {
+                    utils.showToast('يرجى ملء جميع الحقول', 'error');
+                    return;
+                }
+                
+                if (!utils.isValidEmail(email)) {
+                    utils.showToast('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                    return;
+                }
+                
+                // Show loading
+                const submitBtn = this.querySelector('.submit-btn');
+                const originalContent = utils.showLoading(submitBtn);
+                
+                // Attempt login
+                authService.login({ email, password })
+                    .then(data => {
+                        utils.showToast('تم تسجيل الدخول بنجاح!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'demo.html';
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        utils.showToast(error.message || 'فشل في تسجيل الدخول', 'error');
+                        utils.hideLoading(submitBtn, originalContent);
+                    });
             });
             
             // إرسال نموذج إنشاء حساب
             signupForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                const fullName = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
                 const password = document.getElementById('signup-password').value;
                 const confirmPassword = document.getElementById('signup-confirm-password').value;
+                const phone = document.getElementById('signup-phone').value;
                 
-                if (password !== confirmPassword) {
-                    alert('كلمة المرور غير متطابقة!');
+                // Validate inputs
+                if (!fullName || !email || !password || !confirmPassword) {
+                    utils.showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
                     return;
                 }
                 
-                // في التطبيق الحقيقي، سيتم إرسال البيانات إلى الخادم
-                alert('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.');
-                switchToLoginBtn.click();
+                if (!utils.isValidEmail(email)) {
+                    utils.showToast('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    utils.showToast('كلمة المرور غير متطابقة!', 'error');
+                    return;
+                }
+                
+                const passwordValidation = utils.validatePassword(password);
+                if (!passwordValidation.isValid) {
+                    utils.showToast(passwordValidation.errors[0], 'error');
+                    return;
+                }
+                
+                // Show loading
+                const submitBtn = this.querySelector('.submit-btn');
+                const originalContent = utils.showLoading(submitBtn);
+                
+                // Attempt registration
+                const userData = {
+                    fullName,
+                    username: email.split('@')[0], // Generate username from email
+                    email,
+                    password,
+                    phone
+                };
+                
+                authService.register(userData)
+                    .then(data => {
+                        utils.showToast('تم إنشاء الحساب بنجاح!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'demo.html';
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        utils.showToast(error.message || 'فشل في إنشاء الحساب', 'error');
+                        utils.hideLoading(submitBtn, originalContent);
+                    });
+            });
+            
+            // Forgot password handler
+            document.querySelector('.forgot-password').addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = prompt('يرجى إدخال بريدك الإلكتروني:');
+                if (email && utils.isValidEmail(email)) {
+                    authService.forgotPassword(email)
+                        .then(() => {
+                            utils.showToast('تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني', 'success');
+                        })
+                        .catch(error => {
+                            utils.showToast(error.message || 'فشل في إرسال رابط إعادة التعيين', 'error');
+                        });
+                } else if (email) {
+                    utils.showToast('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                }
             });
         });
+        
+        // Function to dynamically load scripts
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
     </script>
 </body>
 </html>

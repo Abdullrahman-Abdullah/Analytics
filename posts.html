@@ -1154,32 +1154,184 @@
         </div>
     </main>
 
-    <script>
-        // تفعيل القائمة الجانبية للهواتف
-        let menuToggle = document.querySelector('.menu-toggle')
-        let sidebar = document.querySelector('.sidebar');
-        document.querySelector('.menu-toggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-            menuToggle.style.display="none";
+        
+        // Function to dynamically load scripts
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        // تهيئة الرسوم البيانية
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load required scripts
+            loadScript('js/config.js')
+                .then(() => loadScript('js/auth.js'))
+                .then(() => loadScript('js/api.js'))
+                .then(() => loadScript('js/analytics.js'))
+                .then(() => loadScript('js/utils.js'))
+                .then(() => {
+                    // Check authentication
+                    if (!utils.requireAuth()) return;
+                    
+                    // Update user display
+                    utils.updateUserDisplay();
+                    
+                    // Load posts data
+                    loadPostsData();
+                    
+                    // Initialize charts
+                    initializePostsCharts();
+                });
+            
+            setupMobileMenu();
         });
+        
+        // Setup mobile menu functionality
+        function setupMobileMenu() {
+            // رسم بياني لتفاعل المنشورات
+            let menuToggle = document.querySelector('.menu-toggle');
+            let sidebar = document.querySelector('.sidebar');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                menuToggle.style.display = "none";
+            });
 
-        document.querySelector('.close-sidebar').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.remove('active');
-            menuToggle.style.display="flex";
-        });
-        document.addEventListener('click', function(event) {
+            document.querySelector('.close-sidebar').addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                menuToggle.style.display = "flex";
+            });
+            
+            document.addEventListener('click', function(event) {
                 if (window.innerWidth <= 768 && 
                     !sidebar.contains(event.target) && 
                     !menuToggle.contains(event.target) && 
                     sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
-                    menuToggle.style.display="flex";
-                    menuToggle.style.transition = '.2s ';
+                    menuToggle.style.display = "flex";
                 }
             });
-        // تهيئة الرسوم البيانية
-        document.addEventListener('DOMContentLoaded', function() {
-            // رسم بياني لتفاعل المنشورات
+        }
+        
+        // Load posts data from API
+        async function loadPostsData() {
+            try {
+                const postsData = await analyticsService.getPostsAnalytics('month');
+                updatePostsDisplay(postsData);
+                
+                // Apply filters button handler
+                document.querySelector('.apply-filters').addEventListener('click', async function() {
+                    const contentType = document.querySelector('.posts-filters select').value;
+                    const period = document.querySelectorAll('.posts-filters select')[1].value;
+                    const sortBy = document.querySelectorAll('.posts-filters select')[2].value;
+                    
+                    const originalContent = utils.showLoading(this);
+                    
+                    try {
+                        const data = await analyticsService.getPostsAnalytics(period, contentType);
+                        updatePostsDisplay(data);
+                        utils.showToast('تم تطبيق الفلاتر بنجاح!', 'success');
+                    } catch (error) {
+                        utils.showToast('فشل في تحميل البيانات', 'error');
+                    } finally {
+                        utils.hideLoading(this, originalContent);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading posts data:', error);
+                utils.showToast('فشل في تحميل البيانات، سيتم عرض البيانات التجريبية', 'warning');
+            }
+        }
+        
+        // Update posts display with real data
+        function updatePostsDisplay(data) {
+            // Update overview cards
+            const overviewCards = document.querySelectorAll('.overview-card');
+            
+            if (overviewCards[0] && data.totalPosts) {
+                overviewCards[0].querySelector('.value').textContent = utils.formatNumber(data.totalPosts);
+            }
+            
+            if (overviewCards[1] && data.averageLikes) {
+                overviewCards[1].querySelector('.value').textContent = utils.formatNumber(data.averageLikes);
+            }
+            
+            if (overviewCards[2] && data.averageComments) {
+                overviewCards[2].querySelector('.value').textContent = utils.formatNumber(data.averageComments);
+            }
+            
+            if (overviewCards[3] && data.shareRate) {
+                overviewCards[3].querySelector('.value').textContent = `${data.shareRate}%`;
+            }
+            
+            // Update posts list
+            if (data.topPosts) {
+                updatePostsList(data.topPosts);
+            }
+        }
+        
+        // Update posts list
+        function updatePostsList(posts) {
+            const postsList = document.querySelector('.posts-list');
+            if (postsList) {
+                // Clear existing posts except the first 3 (keep as examples)
+                const existingPosts = postsList.querySelectorAll('.post-item');
+                if (existingPosts.length > 3) {
+                    for (let i = 3; i < existingPosts.length; i++) {
+                        existingPosts[i].remove();
+                    }
+                }
+                
+                // Add new posts from API
+                posts.slice(3).forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.className = 'post-item';
+                    postItem.innerHTML = `
+                        <div class="post-thumbnail">
+                            <i class="fas fa-${post.type === 'video' ? 'video' : post.type === 'reel' ? 'film' : 'image'}"></i>
+                        </div>
+                        <div class="post-info">
+                            <div class="post-title">${post.content}</div>
+                            <div class="post-details">
+                                <div class="post-detail">
+                                    <i class="fas fa-heart"></i>
+                                    <span>${utils.formatNumber(post.likes)}</span>
+                                </div>
+                                <div class="post-detail">
+                                    <i class="fas fa-comment"></i>
+                                    <span>${utils.formatNumber(post.comments)}</span>
+                                </div>
+                                <div class="post-detail">
+                                    <i class="fas fa-save"></i>
+                                    <span>${utils.formatNumber(post.saves)}</span>
+                                </div>
+                                <div class="post-detail">
+                                    <i class="fas fa-share"></i>
+                                    <span>${utils.formatNumber(post.shares)}</span>
+                                </div>
+                                <div class="post-detail">
+                                    <i class="fas fa-eye"></i>
+                                    <span>${utils.formatNumber(post.reach)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </div>
+                    `;
+                    postsList.appendChild(postItem);
+                });
+            }
+        }
+        
+        // Initialize posts charts
+        function initializePostsCharts() {
             const engagementCtx = document.getElementById('engagementChart').getContext('2d');
             const engagementChart = new Chart(engagementCtx, {
                 type: 'line',

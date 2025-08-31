@@ -725,6 +725,23 @@
     <script>
         // فتح وإغلاق القائمة الجانبية على الهاتف
         document.addEventListener('DOMContentLoaded', function() {
+            // Load required scripts
+            loadScript('js/config.js')
+                .then(() => loadScript('js/auth.js'))
+                .then(() => loadScript('js/api.js'))
+                .then(() => loadScript('js/analytics.js'))
+                .then(() => loadScript('js/utils.js'))
+                .then(() => {
+                    // Check authentication
+                    if (!utils.requireAuth()) return;
+                    
+                    // Update user display
+                    utils.updateUserDisplay();
+                    
+                    // Load dashboard data
+                    loadDashboardData();
+                });
+            
             const menuToggle = document.querySelector('.menu-toggle');
             const sidebar = document.querySelector('.sidebar');
             const closeSidebar = document.querySelector('.close-sidebar');
@@ -772,6 +789,88 @@
             // إنشاء الرسوم البيانية
             createCharts();
         });
+        
+        // Load dashboard data from API
+        async function loadDashboardData() {
+            try {
+                const overviewData = await analyticsService.getOverview('month');
+                updateDashboardStats(overviewData);
+                
+                const followersData = await analyticsService.getFollowersAnalytics('week');
+                updateFollowersChart(followersData);
+                
+                const postsData = await analyticsService.getPostsAnalytics('month');
+                updatePostsTable(postsData);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                utils.showToast('فشل في تحميل البيانات، سيتم عرض البيانات التجريبية', 'warning');
+            }
+        }
+        
+        // Update dashboard statistics
+        function updateDashboardStats(data) {
+            const statCards = document.querySelectorAll('.stat-card');
+            
+            if (statCards[0]) {
+                statCards[0].querySelector('.value').textContent = utils.formatNumber(data.totalFollowers);
+                const change = statCards[0].querySelector('.change');
+                change.textContent = `↑ ${data.followersChange.value} (${data.followersChange.percentage}%)`;
+                change.className = `change ${data.followersChange.trend}`;
+            }
+            
+            if (statCards[1]) {
+                statCards[1].querySelector('.value').textContent = `${data.engagementRate}%`;
+                const change = statCards[1].querySelector('.change');
+                change.textContent = `↑ ${data.engagementChange.value}%`;
+                change.className = `change ${data.engagementChange.trend}`;
+            }
+            
+            if (statCards[2]) {
+                statCards[2].querySelector('.value').textContent = data.postsThisMonth;
+                const change = statCards[2].querySelector('.change');
+                change.textContent = `↓ ${Math.abs(data.postsChange.value)}`;
+                change.className = `change ${data.postsChange.trend}`;
+            }
+            
+            if (statCards[3]) {
+                statCards[3].querySelector('.value').textContent = `+${utils.formatNumber(data.followersGrowth)}`;
+                const change = statCards[3].querySelector('.change');
+                change.textContent = `↑ ${data.growthChange.percentage}%`;
+                change.className = `change ${data.growthChange.trend}`;
+            }
+        }
+        
+        // Update followers chart with real data
+        function updateFollowersChart(data) {
+            // This will be called after createCharts() to update with real data
+            // The chart instance can be stored globally and updated here
+        }
+        
+        // Update posts table with real data
+        function updatePostsTable(data) {
+            const tbody = document.querySelector('table tbody');
+            if (tbody && data.topPosts) {
+                tbody.innerHTML = '';
+                
+                data.topPosts.forEach(post => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="post-thumbnail">
+                                <i class="fas fa-${post.type === 'video' ? 'video' : 'image'}"></i>
+                            </div>
+                        </td>
+                        <td>${post.content}</td>
+                        <td>${utils.formatNumber(post.likes)}</td>
+                        <td>${utils.formatNumber(post.comments)}</td>
+                        <td>${utils.formatNumber(post.saves)}</td>
+                        <td>${utils.formatNumber(post.reach)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
         
         // إنشاء الرسوم البيانية
         function createCharts() {
@@ -854,6 +953,17 @@
                     
                     // في التطبيق الحقيقي، هنا سيتم تحديث البيانات حسب الفترة المحددة
                 });
+            });
+        }
+        
+        // Function to dynamically load scripts
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
             });
         }
     </script>
